@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * A JPA {@link Entity} representation of a Book, which extends {@link AbstractPersistable} to
  * provide generic methods.
  * 
- * @author DylanTS
+ * @author dylants
  * 
  */
 @Entity
