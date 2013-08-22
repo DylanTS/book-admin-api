@@ -1,0 +1,9 @@
+// default books
+[
+    {
+        "_class" : "org.example.domain.Book",
+        "id" : 1,
+        "title" : "The Elegant Universe: Superstrings, Hidden Dimensions, and the Quest for the Ultimate Theory",
+        "author" : "Brian Greene"
+    }
+]
