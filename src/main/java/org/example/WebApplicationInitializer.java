@@ -1,12 +1,15 @@
 package org.example;
 
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.example.config.DataConfig;
+import org.example.config.data.DataConfig;
+import org.example.config.exception.IncludeMessageSourceExceptionResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -22,7 +25,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -123,7 +128,21 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
     @Configuration
     @EnableWebMvc
     @ComponentScan(includeFilters = @Filter(Controller.class), useDefaultFilters = false)
-    public static class ServletContextConfiguration {
+    public static class ServletContextConfiguration extends WebMvcConfigurerAdapter {
+
+        @Override
+        public void configureHandlerExceptionResolvers(
+                List<HandlerExceptionResolver> exceptionResolvers) {
+            /*
+             * Our servlet creates APIs which sometimes require validation on the inputs. To better
+             * inform the user on errors that might occur during validation, we've included error
+             * messages, which can be retrieved via a MessageSource. The new exception resolver
+             * we're using below includes this message in the response.
+             */
+            IncludeMessageSourceExceptionResolver exceptionResolver = new IncludeMessageSourceExceptionResolver(
+                    messageSource());
+            exceptionResolvers.add(exceptionResolver);
+        }
 
         @Bean
         public ReloadableResourceBundleMessageSource messageSource() {

@@ -9,9 +9,7 @@ import javax.validation.Valid;
 import org.example.domain.Book;
 import org.example.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,9 +28,6 @@ public class BooksController {
 
     @Autowired
     private BookRepository bookRepository;
-
-    @Autowired
-    private MessageSource messageSource;
 
     /**
      * Returns all the {@link Book}s stored in our {@link BookRepository}
@@ -85,25 +80,14 @@ public class BooksController {
      *            The {@link HttpServletResponse}
      * @param book
      *            The incoming {@link Book} to be stored
-     * @param bindingResult
-     *            The result of the binding (validation)
      * @return The saved {@link Book}
      * @throws IOException
      */
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public Book addBook(HttpServletRequest request, HttpServletResponse response,
-            @RequestBody @Valid Book book, BindingResult bindingResult) throws IOException {
-        // verify there are no validation errors
-        if (bindingResult.hasErrors()) {
-            // if there is an error, return the error message along with
-            // a 400 HTTP status code
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    this.messageSource.getMessage(bindingResult.getFieldError(), null));
-            return null;
-        }
-
-        // else no validation errors, continue on...
+            @RequestBody @Valid Book book) throws IOException {
+        // Here we're guaranteed to have a valid Book, so let's save it
         return this.bookRepository.save(book);
     }
 
