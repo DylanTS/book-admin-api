@@ -1,6 +1,6 @@
-# Book Admin API #
+# Library API #
 
-Provides a REST API for the Book Admin project
+Provides a REST API for a Library
 
 ## Overview ##
 

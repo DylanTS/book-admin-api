@@ -3,8 +3,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.example</groupId>
-    <artifactId>book-admin-api</artifactId>
-    <name>book-admin-api</name>
+    <artifactId>library-api</artifactId>
+    <name>library-api</name>
     <packaging>war</packaging>
     <version>0.1-SNAPSHOT</version>
 
