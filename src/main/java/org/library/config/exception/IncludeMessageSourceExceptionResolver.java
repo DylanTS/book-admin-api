@@ -1,4 +1,4 @@
-package org.example.config.exception;
+package org.library.config.exception;
 
 import java.io.IOException;
 

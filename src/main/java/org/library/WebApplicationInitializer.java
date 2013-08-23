@@ -1,4 +1,4 @@
-package org.example;
+package org.library;
 
 import java.util.List;
 
@@ -8,8 +8,8 @@ import javax.servlet.ServletException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.example.config.data.DataConfig;
-import org.example.config.exception.IncludeMessageSourceExceptionResolver;
+import org.library.config.data.DataConfig;
+import org.library.config.exception.IncludeMessageSourceExceptionResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

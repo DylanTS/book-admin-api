@@ -1,6 +1,6 @@
-package org.example.repository;
+package org.library.repository;
 
-import org.example.domain.Book;
+import org.library.domain.Book;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

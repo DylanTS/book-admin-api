@@ -1,4 +1,4 @@
-package org.example.domain;
+package org.library.domain;
 
 import javax.persistence.Entity;
 

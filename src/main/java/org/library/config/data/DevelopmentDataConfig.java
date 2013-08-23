@@ -1,4 +1,4 @@
-package org.example.config.data;
+package org.library.config.data;
 
 import javax.sql.DataSource;
 
@@ -39,7 +39,7 @@ public class DevelopmentDataConfig implements DataConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setJpaVendorAdapter(vendorAdapter);
         // scan from here for repository beans
-        em.setPackagesToScan("org.example");
+        em.setPackagesToScan("org.library");
         // set the data source (database configuration)
         em.setDataSource(dataSource());
 
