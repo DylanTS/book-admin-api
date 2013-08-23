@@ -7,6 +7,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -25,9 +27,12 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 @Profile("production")
 public class ProductionDataConfig implements DataConfig {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     @Bean
     public DataSource dataSource() {
+        logger.info("for production, attempting to load the DataSource via JNDI");
         try {
             // attempt to load the DataSource via JNDI
             Context ctx = new InitialContext();

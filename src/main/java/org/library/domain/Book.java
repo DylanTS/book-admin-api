@@ -51,4 +51,10 @@ public class Book extends AbstractPersistable<Long> {
     public void setAuthor(String author) {
         this.author = author;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Book with id: %s, title: %s, author: %s", getId(), title, author);
+    }
+
 }

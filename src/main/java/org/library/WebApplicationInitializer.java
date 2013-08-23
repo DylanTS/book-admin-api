@@ -10,6 +10,8 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.library.config.data.DataConfig;
 import org.library.config.exception.IncludeMessageSourceExceptionResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,6 +46,8 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
  */
 public class WebApplicationInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class<?>[]{RootContextConfiguration.class};
@@ -62,7 +66,10 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         // set the default profile to "development"
-        servletContext.setInitParameter("spring.profiles.default", "development");
+        String initParamName = "spring.profiles.default";
+        String initParamValue = "development";
+        logger.info("setting the {} to {}", initParamName, initParamValue);
+        servletContext.setInitParameter(initParamName, initParamValue);
         super.onStartup(servletContext);
     }
 
@@ -77,6 +84,8 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
     @ComponentScan(includeFilters = @Filter({Service.class, Configuration.class}), useDefaultFilters = false)
     @EnableJpaRepositories
     public static class RootContextConfiguration {
+
+        private final Logger logger = LoggerFactory.getLogger(getClass());
 
         /**
          * Part of the JPA configuration is done based on the {@link Environment}, and will be
@@ -106,7 +115,9 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
          */
         @Bean
         public JacksonRepositoryPopulatorFactoryBean repositoryPopulator() {
-            Resource sourceData = new ClassPathResource("data/data.json");
+            String dataLocation = "data/data.json";
+            logger.info("populating the repository with the data found in {}", dataLocation);
+            Resource sourceData = new ClassPathResource(dataLocation);
 
             JacksonRepositoryPopulatorFactoryBean factory = new JacksonRepositoryPopulatorFactoryBean();
             ObjectMapper mapper = new ObjectMapper();
@@ -130,6 +141,8 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
     @ComponentScan(includeFilters = @Filter(Controller.class), useDefaultFilters = false)
     public static class ServletContextConfiguration extends WebMvcConfigurerAdapter {
 
+        private final Logger logger = LoggerFactory.getLogger(getClass());
+
         @Override
         public void configureHandlerExceptionResolvers(
                 List<HandlerExceptionResolver> exceptionResolvers) {
@@ -139,6 +152,7 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
              * messages, which can be retrieved via a MessageSource. The new exception resolver
              * we're using below includes this message in the response.
              */
+            logger.debug("adding our IncludeMessageSourceExceptionResolver to the exception resolvers");
             IncludeMessageSourceExceptionResolver exceptionResolver = new IncludeMessageSourceExceptionResolver(
                     messageSource());
             exceptionResolvers.add(exceptionResolver);
@@ -146,6 +160,7 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
 
         @Bean
         public ReloadableResourceBundleMessageSource messageSource() {
+            logger.debug("loading the MessageSource error messages");
             ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
             messageSource.setBasename("classpath:messages/errors");
             messageSource.setCacheSeconds(10);

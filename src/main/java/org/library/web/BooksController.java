@@ -8,6 +8,8 @@ import javax.validation.Valid;
 
 import org.library.domain.Book;
 import org.library.repository.BookRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/books")
 public class BooksController {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -37,6 +41,7 @@ public class BooksController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Iterable<Book> finaAllBooks() {
+        logger.debug("GET request on all books");
         return this.bookRepository.findAll();
     }
 
@@ -56,14 +61,17 @@ public class BooksController {
     @ResponseBody
     public Book findBook(HttpServletRequest request, HttpServletResponse response,
             @PathVariable Long bookId) throws IOException {
+        logger.debug("GET request for book with id {}", bookId);
         // attempt to find the one book by ID
         Book book = this.bookRepository.findOne(bookId);
 
         // if we found it, return it
         if (book != null) {
+            logger.debug("book found, returning {}", book);
             return book;
         } else {
             // else send a response not found
+            logger.debug("book not found, returning 400 status code");
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book with ID " + bookId
                     + " not found");
             return null;
@@ -88,6 +96,7 @@ public class BooksController {
     public Book addBook(HttpServletRequest request, HttpServletResponse response,
             @RequestBody @Valid Book book) throws IOException {
         // Here we're guaranteed to have a valid Book, so let's save it
+        logger.debug("creating book {}", book);
         return this.bookRepository.save(book);
     }
 

@@ -2,6 +2,8 @@ package org.library.config.data;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,9 +24,12 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 @Profile("development")
 public class DevelopmentDataConfig implements DataConfig {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     @Bean
     public DataSource dataSource() {
+        logger.info("for development, using an HSQL DataSource");
         return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).build();
     }
 
