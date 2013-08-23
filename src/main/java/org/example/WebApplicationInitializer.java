@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -123,6 +124,14 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
     @EnableWebMvc
     @ComponentScan(includeFilters = @Filter(Controller.class), useDefaultFilters = false)
     public static class ServletContextConfiguration {
+
+        @Bean
+        public ReloadableResourceBundleMessageSource messageSource() {
+            ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+            messageSource.setBasename("classpath:messages/errors");
+            messageSource.setCacheSeconds(10);
+            return messageSource;
+        }
 
     }
 }
