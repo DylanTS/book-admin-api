@@ -2,6 +2,7 @@ package org.example.domain;
 
 import javax.persistence.Entity;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -16,7 +17,9 @@ public class Book extends AbstractPersistable<Long> {
 
     private static final long serialVersionUID = 9126262074862025864L;
 
+    @NotBlank
     private String title;
+    @NotBlank
     private String author;
 
     /**

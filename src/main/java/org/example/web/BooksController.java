@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.example.domain.Book;
 import org.example.repository.BookRepository;
@@ -71,7 +72,7 @@ public class BooksController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public Book addBook(@RequestBody Book book) {
+    public Book addBook(@RequestBody @Valid Book book) {
         return this.bookRepository.save(book);
     }
 
