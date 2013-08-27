@@ -40,7 +40,7 @@ public class BooksController {
      */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public Iterable<Book> finaAllBooks() {
+    public Iterable<Book> findAllBooks() {
         logger.debug("GET request on all books");
         return this.bookRepository.findAll();
     }
