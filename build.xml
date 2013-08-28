@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="library-api" default="build-app" basedir=".">
+
+    <target name="build-app">
+        <exec executable="mvn">
+            <arg value="clean"/>
+            <arg value="compile"/>
+        </exec>
+    </target>
+
+    <target name="tomcat" depends="build-app">
+        <exec executable="mvn">
+            <arg value="-DskipTests=true"/>
+            <arg value="tomcat7:run-war"/>
+        </exec>
+    </target>
+</project>
+
