@@ -3,7 +3,6 @@ package org.library.domain;
 import javax.persistence.Entity;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * A JPA {@link Entity} representation of a Book, which extends {@link AbstractPersistable} to
