@@ -5,9 +5,6 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.library.config.data.DataConfig;
 import org.library.config.exception.IncludeMessageSourceExceptionResolver;
 import org.slf4j.Logger;
@@ -19,10 +16,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.repository.init.JacksonRepositoryPopulatorFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -85,8 +79,6 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
     @EnableJpaRepositories
     public static class RootContextConfiguration {
 
-        private final Logger logger = LoggerFactory.getLogger(getClass());
-
         /**
          * Part of the JPA configuration is done based on the {@link Environment}, and will be
          * supplied via this {@link DataConfig} bean
@@ -105,27 +97,6 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
             transactionManager.setEntityManagerFactory(this.dataConfig.entityManagerFactory()
                     .getObject());
             return transactionManager;
-        }
-
-        /**
-         * Pre-populate the database with the information specified in the data/data.json file
-         * 
-         * @return The {@link JacksonRepositoryPopulatorFactoryBean} which will perform the
-         *         operations necessary to pre-populate the database
-         */
-        @Bean
-        public JacksonRepositoryPopulatorFactoryBean repositoryPopulator() {
-            String dataLocation = "data/data.json";
-            logger.info("populating the repository with the data found in {}", dataLocation);
-            Resource sourceData = new ClassPathResource(dataLocation);
-
-            JacksonRepositoryPopulatorFactoryBean factory = new JacksonRepositoryPopulatorFactoryBean();
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-            mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            factory.setMapper(mapper);
-            factory.setResources(new Resource[]{sourceData});
-            return factory;
         }
     }
 

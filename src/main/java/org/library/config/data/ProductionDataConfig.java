@@ -52,7 +52,7 @@ public class ProductionDataConfig implements DataConfig {
 
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setJpaVendorAdapter(vendorAdapter);
-        // scan from here for repository beans
+        // scan from root package for repository beans
         em.setPackagesToScan("org.library");
         // set the data source (database configuration)
         em.setDataSource(dataSource());
