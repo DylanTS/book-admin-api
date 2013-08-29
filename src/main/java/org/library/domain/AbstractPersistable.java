@@ -2,10 +2,12 @@ package org.library.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -24,6 +26,8 @@ public abstract class AbstractPersistable<ID extends Serializable> implements Pe
     private static final long serialVersionUID = -89787050266927411L;
 
     @Id
+    @GeneratedValue(generator = "IdOrGenerated")
+    @GenericGenerator(name = "IdOrGenerated", strategy = "org.library.persistence.UseExistingOrGenerateIdGenerator")
     protected ID id;
 
     @JsonIgnore
