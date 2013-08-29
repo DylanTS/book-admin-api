@@ -2,8 +2,6 @@ package org.library.config.data;
 
 import java.sql.SQLException;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -35,9 +33,9 @@ public class ProductionDataConfigTest {
 
     @BeforeClass
     public static void setupBeforeClass() throws NamingException {
-        SimpleNamingContextBuilder.emptyActivatedContextBuilder();
-        Context context = new InitialContext();
-        context.bind("java:comp/env/jdbc/web",
+        SimpleNamingContextBuilder builder = SimpleNamingContextBuilder
+                .emptyActivatedContextBuilder();
+        builder.bind("java:comp/env/jdbc/web",
                 new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).build());
     }
 
