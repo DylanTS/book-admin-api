@@ -122,8 +122,6 @@ public class BooksControllerTest {
         // perform the POST request
         ResultActions actions = this.mockMvc.perform(post("/books").contentType(
                 MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
-        actions = this.mockMvc.perform(post("/books").contentType(
-                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
 
         // verify the response is OK
         actions.andExpect(status().isOk());

@@ -3,21 +3,20 @@ package org.library.persistence;
 import java.io.Serializable;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.id.SequenceGenerator;
+import org.hibernate.id.IncrementGenerator;
 
 /**
  * This becomes our strategy for generating IDs for our entities. We want to be able to generate
  * data through the data.json file, and in doing so, need to the ability to specify the ID of the
  * entity we create (so we can access it later). But at the same time, we want to be able to
  * generate the ID when creating these entities from user data. This implementation allows us to do
- * both, and also (hopes to) prevent generating an ID we've already manually specified by adding
- * 1000 to all generated IDs. In this way we hope to "floor" the generated ID number to allow for
- * 1000 entities of test data (if needed).
+ * both, by using our supplied ID when generated and incrementing the highest ID of the entity in
+ * concern when generating the ID here (using the parent class implementation).
  * 
  * @author dylants
  * 
  */
-public class UseExistingOrGenerateIdGenerator extends SequenceGenerator {
+public class UseExistingOrGenerateIdGenerator extends IncrementGenerator {
 
     @Override
     public Serializable generate(SessionImplementor session, Object obj) {
@@ -28,12 +27,8 @@ public class UseExistingOrGenerateIdGenerator extends SequenceGenerator {
         if (id != null) {
             return id;
         } else {
-            // floor the IDs that are generated at 1000 to allow for test data
-            Serializable generatedID = super.generate(session, obj);
-            if (generatedID instanceof Long) {
-                generatedID = ((Long) generatedID) + 1000L;
-            }
-            return generatedID;
+            // use the parent class to generate the next ID to use
+            return super.generate(session, obj);
         }
     }
 
