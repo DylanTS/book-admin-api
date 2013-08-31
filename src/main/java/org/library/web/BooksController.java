@@ -71,7 +71,7 @@ public class BooksController {
             return book;
         } else {
             // else send a response not found
-            logger.debug("book not found, returning 400 status code");
+            logger.debug("book not found, returning 404 status code");
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book with ID " + bookId
                     + " not found");
             return null;
@@ -89,15 +89,56 @@ public class BooksController {
      * @param book
      *            The incoming {@link Book} to be stored
      * @return The saved {@link Book}
-     * @throws IOException
      */
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public Book addBook(HttpServletRequest request, HttpServletResponse response,
-            @RequestBody @Valid Book book) throws IOException {
+            @RequestBody @Valid Book book) {
         // Here we're guaranteed to have a valid Book, so let's save it
         logger.debug("creating book {}", book);
         return this.bookRepository.save(book);
     }
 
+    @RequestMapping(value = "/{bookId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Book updateBook(HttpServletRequest request, HttpServletResponse response,
+            @PathVariable Long bookId, @RequestBody @Valid Book book) throws IOException {
+        logger.debug("PUT request for book with id {}, updating book to {}", bookId, book);
+        // attempt to find the book by ID
+        Book existingBook = this.bookRepository.findOne(bookId);
+
+        // if we found it, update it
+        if (existingBook != null) {
+            logger.debug("book to update found with data {}", existingBook);
+            // verify the book we're to save has the correct ID
+            book.setId(bookId);
+            return this.bookRepository.save(book);
+        } else {
+            // else send a response not found
+            logger.debug("book not found, returning 404 status code");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book with ID " + bookId
+                    + " not found");
+            return null;
+        }
+    }
+
+    @RequestMapping(value = "/{bookId}", method = RequestMethod.DELETE)
+    public void deleteBook(HttpServletRequest request, HttpServletResponse response,
+            @PathVariable Long bookId) throws IOException {
+        logger.debug("DELETE request for book with id {}", bookId);
+        // attempt to find the book by ID
+        Book book = this.bookRepository.findOne(bookId);
+
+        // if we found it, delete it
+        if (book != null) {
+            logger.debug("book found, deleting {}", book);
+            this.bookRepository.delete(book);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            // else send a response not found
+            logger.debug("book not found, returning 404 status code");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book with ID " + bookId
+                    + " not found");
+        }
+    }
 }

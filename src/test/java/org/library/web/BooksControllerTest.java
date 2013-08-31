@@ -1,7 +1,9 @@
 package org.library.web;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
@@ -137,6 +139,112 @@ public class BooksControllerTest {
         Assert.assertTrue("id must exist", createdBook.getId() != null);
         Assert.assertEquals("title must match", title, createdBook.getTitle());
         Assert.assertEquals("author must match", author, createdBook.getAuthor());
+    }
+
+    @Test
+    public void testPUT_CreateAndUpdateBook() throws Exception {
+        String title = "The Cat in the Hat";
+        String author = "Dr. Suess";
+        Book book = new Book();
+        book.setTitle(title);
+        book.setAuthor(author);
+
+        // perform the POST request
+        ResultActions actions = this.mockMvc.perform(post("/books").contentType(
+                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
+
+        // verify the response is OK
+        actions.andExpect(status().isOk());
+        MvcResult result = actions.andReturn();
+        Assert.assertNotNull("result must not be null", result);
+        String content = result.getResponse().getContentAsString();
+        Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
+
+        // convert the content in the response to a book
+        Book createdBook = objectMapper.readValue(content, Book.class);
+
+        // perform the PUT to update the book
+        String updatedTitle = "Green Eggs and Ham";
+        createdBook.setTitle(updatedTitle);
+        actions = this.mockMvc.perform(put("/books/" + createdBook.getId()).contentType(
+                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(createdBook)));
+
+        // verify the response is OK
+        actions.andExpect(status().isOk());
+        result = actions.andReturn();
+        Assert.assertNotNull("result must not be null", result);
+        content = result.getResponse().getContentAsString();
+        Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
+
+        // convert the content in the response to a book
+        Book updatedBook = objectMapper.readValue(content, Book.class);
+
+        // verify the book details
+        Assert.assertEquals("id must match", createdBook.getId(), updatedBook.getId());
+        Assert.assertEquals("title must match", updatedTitle, updatedBook.getTitle());
+        Assert.assertEquals("author must match", createdBook.getAuthor(), updatedBook.getAuthor());
+    }
+
+    @Test
+    public void testPUT_UpdateBookThatDoesNotExist() throws Exception {
+        String title = "The Big Hungry Bear";
+        String author = "Don and Audrey Wood";
+        Book book = new Book();
+        book.setId(99L);
+        book.setTitle(title);
+        book.setAuthor(author);
+
+        // perform the PUT request
+        ResultActions actions = this.mockMvc.perform(put("/books/" + book.getId()).contentType(
+                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
+
+        // verify the response is not found
+        actions.andExpect(status().is(404));
+    }
+
+    @Test
+    public void testDELETE_CreateAndDeleteBook() throws Exception {
+        String title = "Hug";
+        String author = "Jez Alborough";
+        Book book = new Book();
+        book.setTitle(title);
+        book.setAuthor(author);
+
+        // perform the POST request
+        ResultActions actions = this.mockMvc.perform(post("/books").contentType(
+                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
+
+        // verify the response is OK
+        actions.andExpect(status().isOk());
+        MvcResult result = actions.andReturn();
+        Assert.assertNotNull("result must not be null", result);
+        String content = result.getResponse().getContentAsString();
+        Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
+
+        // convert the content in the response to a book
+        Book createdBook = objectMapper.readValue(content, Book.class);
+
+        // perform the DELETE to delete the book
+        actions = this.mockMvc.perform(delete("/books/" + createdBook.getId()).contentType(
+                MediaType.APPLICATION_JSON));
+
+        // verify the response is OK
+        actions.andExpect(status().isOk());
+
+        // verify the book does not exist any more
+        actions = this.mockMvc.perform(get("/books/" + createdBook.getId()));
+        // verify the response is not found
+        actions.andExpect(status().is(404));
+    }
+
+    @Test
+    public void testDELETE_DeleteBookThatDoesNotExist() throws Exception {
+        // perform the DELETE request
+        ResultActions actions = this.mockMvc.perform(delete("/books/99").contentType(
+                MediaType.APPLICATION_JSON));
+
+        // verify the response is not found
+        actions.andExpect(status().is(404));
     }
 
 }
