@@ -49,7 +49,41 @@ public class IncludeMessageSourceExceptionResolverTest {
         ModelAndView mav = this.resolver.handleMethodArgumentNotValidException(ex, request,
                 response, handler);
         Assert.assertNotNull("model and view must not be null", mav);
-        Assert.assertEquals("status must be 400", HttpServletResponse.SC_BAD_REQUEST,
+        Assert.assertEquals("status must be 404", HttpServletResponse.SC_BAD_REQUEST,
+                response.getStatus());
+        Assert.assertNull("message must be null", response.getErrorMessage());
+    }
+    
+    @Test
+    public void testHandleMethodArgumentNotValidException_NullMessage() throws IOException {
+        this.messageSource = EasyMock.createNiceMock(MessageSource.class);
+        EasyMock.expect(
+                this.messageSource.getMessage(EasyMock.isA(MessageSourceResolvable.class),
+                        (Locale) EasyMock.isNull())).andReturn(null).anyTimes();
+        EasyMock.replay(this.messageSource);
+        this.resolver = new IncludeMessageSourceExceptionResolver(this.messageSource);
+
+        ModelAndView mav = this.resolver.handleMethodArgumentNotValidException(ex, request,
+                response, handler);
+        Assert.assertNotNull("model and view must not be null", mav);
+        Assert.assertEquals("status must be 404", HttpServletResponse.SC_BAD_REQUEST,
+                response.getStatus());
+        Assert.assertNull("message must be null", response.getErrorMessage());
+    }
+    
+    @Test
+    public void testHandleMethodArgumentNotValidException_EmptyMessage() throws IOException {
+        this.messageSource = EasyMock.createNiceMock(MessageSource.class);
+        EasyMock.expect(
+                this.messageSource.getMessage(EasyMock.isA(MessageSourceResolvable.class),
+                        (Locale) EasyMock.isNull())).andReturn("").anyTimes();
+        EasyMock.replay(this.messageSource);
+        this.resolver = new IncludeMessageSourceExceptionResolver(this.messageSource);
+
+        ModelAndView mav = this.resolver.handleMethodArgumentNotValidException(ex, request,
+                response, handler);
+        Assert.assertNotNull("model and view must not be null", mav);
+        Assert.assertEquals("status must be 404", HttpServletResponse.SC_BAD_REQUEST,
                 response.getStatus());
         Assert.assertNull("message must be null", response.getErrorMessage());
     }
@@ -66,7 +100,7 @@ public class IncludeMessageSourceExceptionResolverTest {
         ModelAndView mav = this.resolver.handleMethodArgumentNotValidException(ex, request,
                 response, handler);
         Assert.assertNotNull("model and view must not be null", mav);
-        Assert.assertEquals("status must be 400", HttpServletResponse.SC_BAD_REQUEST,
+        Assert.assertEquals("status must be 404", HttpServletResponse.SC_BAD_REQUEST,
                 response.getStatus());
         Assert.assertEquals("message must match", MESSAGE, response.getErrorMessage());
     }

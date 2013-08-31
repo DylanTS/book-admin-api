@@ -36,7 +36,7 @@ public class IncludeMessageSourceExceptionResolver extends DefaultHandlerExcepti
         if (bindingResult != null) {
             String message = this.messageSource.getMessage(bindingResult.getFieldError(), null);
             if (StringUtils.isNotBlank(message)) {
-                // return the error message along with a 400 HTTP status code
+                // return the error message along with a 404 HTTP status code
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                 return new ModelAndView();
             }
