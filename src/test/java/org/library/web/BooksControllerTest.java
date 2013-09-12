@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -27,15 +28,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {WebApplicationInitializer.ServletContextConfiguration.class,
-        WebApplicationInitializer.RootContextConfiguration.class})
+@ContextConfiguration(classes = {WebApplicationInitializer.RootContextConfiguration.class,
+        WebApplicationInitializer.ServletContextConfiguration.class})
 @ActiveProfiles("development")
 @WebAppConfiguration
 public class BooksControllerTest {
 
     private static ObjectMapper objectMapper;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private BooksController bookController;
@@ -48,7 +53,7 @@ public class BooksControllerTest {
 
     @Before
     public void setupBefore() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
     }
 
     @Test
@@ -84,7 +89,11 @@ public class BooksControllerTest {
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content in the response to a book
-        Book book = objectMapper.readValue(content, Book.class);
+        // hopefully temporary, but convert to Object to remove links, then to Book
+        @SuppressWarnings("unchecked")
+        Map<String, String> resource = objectMapper.readValue(content, Map.class);
+        resource.remove("links");
+        Book book = objectMapper.readValue(objectMapper.writeValueAsString(resource), Book.class);
 
         // verify the book details
         Assert.assertEquals("id must match", (long) 1L, (long) book.getId());
@@ -101,16 +110,6 @@ public class BooksControllerTest {
 
         // verify the response is not found
         actions.andExpect(status().isNotFound());
-
-        // verify status message
-        MvcResult result = actions.andReturn();
-        Assert.assertNotNull("result must not be nulL", result);
-        String errorMessage = result.getResponse().getErrorMessage();
-        Assert.assertTrue("errorMessage must exist", StringUtils.isNotBlank(errorMessage));
-        System.out.println(errorMessage);
-
-        Assert.assertEquals("correct error message must exist", "Book with ID " + bookId
-                + " not found", errorMessage);
     }
 
     @Test

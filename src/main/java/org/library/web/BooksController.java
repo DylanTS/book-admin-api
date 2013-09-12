@@ -11,6 +11,10 @@ import org.library.repository.BookRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,13 +29,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 
  */
 @Controller
-@RequestMapping("/books")
+@RequestMapping(value = "/books", produces = {MediaType.APPLICATION_JSON_VALUE,
+        MediaType.TEXT_XML_VALUE})
 public class BooksController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final BookRepository bookRepository;
+    private final BookResourceAssembler bookResourceAssembler;
+
     @Autowired
-    private BookRepository bookRepository;
+    public BooksController(BookRepository bookRepository,
+            BookResourceAssembler bookResourceAssembler) {
+        this.bookRepository = bookRepository;
+        this.bookResourceAssembler = bookResourceAssembler;
+    }
 
     /**
      * Returns all the {@link Book}s stored in our {@link BookRepository}
@@ -59,23 +71,17 @@ public class BooksController {
      */
     @RequestMapping(value = "/{bookId}", method = RequestMethod.GET)
     @ResponseBody
-    public Book findBook(HttpServletRequest request, HttpServletResponse response,
-            @PathVariable Long bookId) throws IOException {
-        logger.debug("GET request for book with id {}", bookId);
-        // attempt to find the one book by ID
-        Book book = this.bookRepository.findOne(bookId);
-
-        // if we found it, return it
-        if (book != null) {
-            logger.debug("book found, returning {}", book);
-            return book;
-        } else {
-            // else send a response not found
+    public ResponseEntity<Resource<Book>> findBook(HttpServletRequest request,
+            HttpServletResponse response, @PathVariable("bookId") Long bookId,
+            @PathVariable("bookId") Book book) throws IOException {
+        if (book == null) {
             logger.debug("book not found, returning 404 status code");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book with ID " + bookId
-                    + " not found");
-            return null;
+            return new ResponseEntity<Resource<Book>>(HttpStatus.NOT_FOUND);
         }
+
+        logger.debug("book found, returning {}", book);
+        Resource<Book> resource = this.bookResourceAssembler.toResource(book);
+        return new ResponseEntity<Resource<Book>>(resource, HttpStatus.OK);
     }
 
     /**

@@ -17,7 +17,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -109,7 +111,8 @@ public class WebApplicationInitializer extends AbstractAnnotationConfigDispatche
      */
     @Configuration
     @EnableWebMvc
-    @ComponentScan(includeFilters = @Filter(Controller.class), useDefaultFilters = false)
+    @EnableSpringDataWebSupport
+    @ComponentScan(includeFilters = @Filter({Controller.class, Component.class}), useDefaultFilters = false)
     public static class ServletContextConfiguration extends WebMvcConfigurerAdapter {
 
         private final Logger logger = LoggerFactory.getLogger(getClass());
