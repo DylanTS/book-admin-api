@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +69,7 @@ public class BooksControllerTest {
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content to an array of books
-        @SuppressWarnings("unchecked")
-        List<Book> books = objectMapper.readValue(content, List.class);
+        List<Book> books = this.convertToBooks(content);
 
         // verify there are books
         Assert.assertNotNull("books must exist", books);
@@ -89,11 +89,7 @@ public class BooksControllerTest {
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content in the response to a book
-        // hopefully temporary, but convert to Object to remove links, then to Book
-        @SuppressWarnings("unchecked")
-        Map<String, String> resource = objectMapper.readValue(content, Map.class);
-        resource.remove("links");
-        Book book = objectMapper.readValue(objectMapper.writeValueAsString(resource), Book.class);
+        Book book = this.convertToBook(content);
 
         // verify the book details
         Assert.assertEquals("id must match", (long) 1L, (long) book.getId());
@@ -124,15 +120,15 @@ public class BooksControllerTest {
         ResultActions actions = this.mockMvc.perform(post("/books").contentType(
                 MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
 
-        // verify the response is OK
-        actions.andExpect(status().isOk());
+        // verify the response is CREATED
+        actions.andExpect(status().isCreated());
         MvcResult result = actions.andReturn();
         Assert.assertNotNull("result must not be null", result);
         String content = result.getResponse().getContentAsString();
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content in the response to a book
-        Book createdBook = objectMapper.readValue(content, Book.class);
+        Book createdBook = this.convertToBook(content);
 
         // verify the book details
         Assert.assertTrue("id must exist", createdBook.getId() != null);
@@ -152,15 +148,15 @@ public class BooksControllerTest {
         ResultActions actions = this.mockMvc.perform(post("/books").contentType(
                 MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
 
-        // verify the response is OK
-        actions.andExpect(status().isOk());
+        // verify the response is CREATED
+        actions.andExpect(status().isCreated());
         MvcResult result = actions.andReturn();
         Assert.assertNotNull("result must not be null", result);
         String content = result.getResponse().getContentAsString();
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content in the response to a book
-        Book createdBook = objectMapper.readValue(content, Book.class);
+        Book createdBook = this.convertToBook(content);
 
         // perform the PUT to update the book
         String updatedTitle = "Green Eggs and Ham";
@@ -176,7 +172,7 @@ public class BooksControllerTest {
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content in the response to a book
-        Book updatedBook = objectMapper.readValue(content, Book.class);
+        Book updatedBook = this.convertToBook(content);
 
         // verify the book details
         Assert.assertEquals("id must match", createdBook.getId(), updatedBook.getId());
@@ -213,15 +209,15 @@ public class BooksControllerTest {
         ResultActions actions = this.mockMvc.perform(post("/books").contentType(
                 MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(book)));
 
-        // verify the response is OK
-        actions.andExpect(status().isOk());
+        // verify the response is CREATED
+        actions.andExpect(status().isCreated());
         MvcResult result = actions.andReturn();
         Assert.assertNotNull("result must not be null", result);
         String content = result.getResponse().getContentAsString();
         Assert.assertTrue("content must exist", StringUtils.isNotBlank(content));
 
         // convert the content in the response to a book
-        Book createdBook = objectMapper.readValue(content, Book.class);
+        Book createdBook = this.convertToBook(content);
 
         // perform the DELETE to delete the book
         actions = this.mockMvc.perform(delete("/books/" + createdBook.getId()).contentType(
@@ -244,6 +240,32 @@ public class BooksControllerTest {
 
         // verify the response is not found
         actions.andExpect(status().is(404));
+    }
+
+    protected Book convertToBook(String content) throws Exception {
+        // hopefully temporary, but convert to Object to remove links, then to Book
+        @SuppressWarnings("unchecked")
+        Map<String, String> resource = objectMapper.readValue(content, Map.class);
+        resource.remove("links");
+        Book book = objectMapper.readValue(objectMapper.writeValueAsString(resource), Book.class);
+        return book;
+    }
+
+    protected List<Book> convertToBooks(String content) throws Exception {
+        // hopefully temporary, but pull just the content to convert to books
+        @SuppressWarnings("unchecked")
+        Map<String, ?> resource = objectMapper.readValue(content, Map.class);
+        @SuppressWarnings("unchecked")
+        List<? extends Map<String, String>> innerContentList = (List<? extends Map<String, String>>) resource
+                .get("content");
+        List<Book> books = new ArrayList<>();
+        for (Map<String, String> innerContent : innerContentList) {
+            // hopefully temporary, remove links before converting to Book
+            innerContent.remove("links");
+            books.add(objectMapper.readValue(objectMapper.writeValueAsString(innerContent),
+                    Book.class));
+        }
+        return books;
     }
 
 }

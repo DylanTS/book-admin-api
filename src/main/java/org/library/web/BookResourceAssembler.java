@@ -6,7 +6,8 @@ import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;
 
 /**
- * A {@link ResourceAssembler} for {@link Book}s
+ * A {@link ResourceAssembler} for {@link Book}s. This is used to convert a {@link Book} to a
+ * {@link Resource}
  * 
  * @author dylants
  * 
