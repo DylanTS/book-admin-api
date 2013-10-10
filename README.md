@@ -1,6 +1,6 @@
 # Library API #
 
-[![Build Status](https://api.travis-ci.org/DylanTS/library-api.png)](https://api.travis-ci.org/DylanTS/library-api.png)
+[![Build Status](https://api.travis-ci.org/dylants/library-api.png)](https://api.travis-ci.org/dylants/library-api.png)
 
 Provides a REST API for a mock (book) library
 
